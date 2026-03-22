@@ -1,0 +1,48 @@
+/* ===== App Layout ===== */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Main content shifts right by sidebar width on desktop */
+.app-main {
+  flex: 1;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--transition-base);
+  background: var(--bg-primary);
+  width: calc(100% - var(--sidebar-width));
+  overflow-x: hidden;
+}
+
+/* When sidebar is collapsed on desktop, main shifts left */
+.sidebar.collapsed ~ .app-main {
+  /* This won't work because .sidebar and .app-main are siblings in .app-layout */
+}
+
+/* Loading states */
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .app-main {
+    margin-left: 0;
+    width: 100%;
+    /* Add top padding on mobile to account for the hamburger button */
+    padding-top: 70px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    padding-top: 64px;
+  }
+}

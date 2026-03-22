@@ -1,0 +1,213 @@
+/* ===== Profile ===== */
+.profile-page {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pf-header {
+  margin-bottom: 28px;
+}
+
+/* Loading skeleton */
+.pf-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 32px;
+  gap: 14px;
+  color: var(--text-muted);
+}
+
+.pf-header h1 { font-family: var(--font-primary); font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+.pf-header p { color: var(--text-muted); }
+
+.pf-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Profile Card */
+.pf-card {
+  background: var(--bg-card);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-xl);
+  padding: 36px;
+  text-align: center;
+}
+
+.pf-avatar-section { margin-bottom: 28px; }
+
+.pf-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 30px rgba(34, 197, 94, 0.3);
+}
+
+.pf-avatar-section h2 {
+  font-family: var(--font-primary);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.pf-role-badge {
+  display: inline-block;
+  padding: 4px 16px;
+  background: var(--primary-50);
+  color: var(--primary-700);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  margin-bottom: 8px;
+}
+
+.pf-rating {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.pf-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 20px 0;
+  border-top: 1px solid var(--neutral-100);
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.pf-stat { text-align: center; }
+
+.pf-stat-value {
+  display: block;
+  font-family: var(--font-primary);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary-600);
+}
+
+.pf-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.pf-verified {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--primary-50);
+  border-radius: var(--radius-md);
+  color: var(--primary-700);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Details */
+.pf-details {
+  background: var(--bg-card);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+}
+
+.pf-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  gap: 12px;
+}
+
+.pf-header-btns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pf-details-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.pf-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pf-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.pf-field:last-child { border-bottom: none; padding-bottom: 0; }
+
+.pf-field-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--neutral-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--primary-600);
+  flex-shrink: 0;
+}
+
+.pf-field-content {
+  flex: 1;
+}
+
+.pf-field-content label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.pf-field-content span {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.pf-field-content .input-field {
+  margin-top: 4px;
+}
+
+.pf-joined {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--neutral-200);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .profile-page { padding: 20px 16px; }
+  .pf-layout { grid-template-columns: 1fr; }
+  .pf-card { padding: 24px 16px; }
+  .pf-details { padding: 24px 16px; }
+}

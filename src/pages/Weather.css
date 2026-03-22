@@ -1,0 +1,254 @@
+/* ===== Weather ===== */
+.weather-page {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.wp-header {
+  margin-bottom: 28px;
+}
+
+.wp-header h1 {
+  font-family: var(--font-primary);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.wp-header p {
+  color: var(--text-muted);
+}
+
+/* Current Weather */
+.weather-current {
+  background: linear-gradient(135deg, #0284c7, #0369a1, #075985);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.weather-current::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.wc-main {
+  text-align: center;
+}
+
+.wc-icon {
+  font-size: 4rem;
+  margin-bottom: 8px;
+}
+
+.wc-temp {
+  font-family: var(--font-primary);
+  font-size: 3.5rem;
+  font-weight: 800;
+}
+
+.wc-condition {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.wc-location {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.wc-details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wc-detail {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  font-size: 1.2rem;
+}
+
+.wcd-label {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.wcd-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Alerts */
+.weather-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.weather-alert {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.weather-alert.warning {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.weather-alert.info {
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  color: #1e40af;
+}
+
+/* Forecast */
+.weather-forecast {
+  background: var(--bg-card);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.weather-forecast h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+
+.forecast-card {
+  text-align: center;
+  padding: 20px 12px;
+  background: var(--neutral-50);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  cursor: default;
+}
+
+.forecast-card:hover {
+  background: var(--primary-50);
+  box-shadow: var(--shadow-md);
+}
+
+.fc-day {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.fc-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.fc-temp {
+  font-family: var(--font-primary);
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.fc-condition {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Crop Advisory */
+.crop-advisory {
+  background: var(--bg-card);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+
+.crop-advisory h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.advisory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.advisory-card {
+  padding: 24px;
+  background: var(--neutral-50);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.advisory-card:hover {
+  background: var(--primary-50);
+}
+
+.advisory-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.advisory-card h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.advisory-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .weather-page {
+    padding: 20px 16px;
+  }
+  .weather-current {
+    flex-direction: column;
+    gap: 28px;
+  }
+  .forecast-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .advisory-grid {
+    grid-template-columns: 1fr;
+  }
+}
