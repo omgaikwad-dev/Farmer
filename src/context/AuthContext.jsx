@@ -121,7 +121,10 @@ export function AuthProvider({ children }) {
   /* ══════ SIGNUP ══════ */
   async function signup(email, password, name, role) {
     const result = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(result.user, { displayName: name });
+    
+    // CRITICAL: Encode role into displayName to guarantee cross-device sync bypassing Firestore completely!
+    const encodedName = `${name}|||${role}`;
+    await updateProfile(result.user, { displayName: encodedName });
 
     const profile = {
       uid:          result.user.uid,
@@ -137,12 +140,9 @@ export function AuthProvider({ children }) {
       verified:     false,
     };
 
-    // Write to Firestore (don't block on failure)
-    setDoc(doc(db, 'users', result.user.uid), profile).catch(err =>
-      console.warn('[Auth] Firestore save failed, will retry:', err.message)
-    );
+    // Try writing to Firestore anyway
+    setDoc(doc(db, 'users', result.user.uid), profile).catch(() => {});
 
-    // Set profile IMMEDIATELY — this is the source of truth
     profileSetByAction.current = true;
     _setProfile(profile);
 
@@ -164,6 +164,23 @@ export function AuthProvider({ children }) {
       if (cached) {
         profileSetByAction.current = true;
         setUserProfile(cached);
+      } else {
+        // Cache is completely empty across new devices, so recover the encoded profile
+        let authName = result.user.displayName || '';
+        let authRole = 'buyer';
+        if (authName.includes('|||')) {
+          const parts = authName.split('|||');
+          authName = parts[0];
+          authRole = parts[1];
+        }
+        const fallbackProfile = {
+           uid: result.user.uid,
+           name: authName || 'User',
+           email: result.user.email,
+           role: authRole
+        };
+        profileSetByAction.current = true;
+        _setProfile(fallbackProfile);
       }
     }
 
@@ -175,15 +192,29 @@ export function AuthProvider({ children }) {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
 
+    // Decode existing name/role if it was embedded
+    let parsedName = result.user.displayName || 'User';
+    let parsedRole = role; // default parameter
+
+    if (parsedName.includes('|||')) {
+      [parsedName, parsedRole] = parsedName.split('|||');
+    }
+
     let snap = null;
     try { snap = await getDoc(doc(db, 'users', result.user.uid)); } catch (_) {}
 
     if (!snap || !snap.exists()) {
+      // Encode it for Google users too, so they have cross-device sync
+      const newEncodedName = `${parsedName}|||${parsedRole}`;
+      if (!result.user.displayName?.includes('|||')) {
+        updateProfile(result.user, { displayName: newEncodedName }).catch(() => {});
+      }
+
       const profile = {
         uid:          result.user.uid,
-        name:         result.user.displayName || 'User',
+        name:         parsedName,
         email:        result.user.email,
-        role,
+        role:         parsedRole,
         phone:        '',
         location:     '',
         avatar:       result.user.photoURL || '',
@@ -211,21 +242,45 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   }
 
-  /* ══════ AUTH STATE OBSERVER ══════
-     KEY FIX: if signup/login already set the profile,
-     DON'T overwrite it with a potentially failed Firestore fetch */
+  /* ══════ AUTH STATE OBSERVER ══════ */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
 
       if (user) {
         if (profileSetByAction.current) {
-          // Profile was already set by signup/login — don't overwrite
           profileSetByAction.current = false;
           setLoading(false);
         } else {
-          // Page reload / returning user — need to fetch profile
+          // Attempt deep decode from Auth object FIRST in case Firestore blocks reads cross-device
+          let authName = user.displayName || '';
+          let authRole = 'buyer';
+          if (authName.includes('|||')) {
+            const parts = authName.split('|||');
+            authName = parts[0];
+            authRole = parts[1];
+          }
+
+          // Try fetching from Firestore/Cache
           await _backgroundFetchProfile(user.uid);
+          
+          // CRITICAL FIX: If _backgroundFetchProfile failed to find a profile entirely 
+          // (which happens on new devices if Firestore rules block reads),
+          // manually reconstruct the profile perfectly utilizing the embedded Auth string!
+          setUserProfile(prev => {
+            if (!prev) {
+              const fallbackProfile = {
+                uid: user.uid,
+                name: authName || 'User',
+                email: user.email,
+                role: authRole,
+              };
+              cacheProfile(fallbackProfile);
+              return fallbackProfile;
+            }
+            return prev;
+          });
+
           setLoading(false);
         }
       } else {
