@@ -50,7 +50,11 @@ export default function Register() {
       addToast('Welcome to FarmConnect! 🌱', 'success');
       navigate('/dashboard');
     } catch (error) {
-      addToast(error.message || 'Google signup failed', 'error');
+      if (error.code === 'auth/unauthorized-domain') {
+        addToast('Please add this domain to Firebase Console > Authentication > Settings > Authorized Domains', 'error');
+      } else {
+        addToast(error.message || 'Google signup failed', 'error');
+      }
     }
   };
 

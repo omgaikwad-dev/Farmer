@@ -63,7 +63,7 @@ export default function Marketplace() {
 
   // Load products from Firestore (if farmers have added them)
   useEffect(() => {
-    const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, 'products'));
     const unsub = onSnapshot(q, (snap) => {
       const products = snap.docs.map(doc => ({
         id: `fs_${doc.id}`,
@@ -72,7 +72,8 @@ export default function Marketplace() {
       }));
       setFirestoreProducts(products);
       setLoadingFirestore(false);
-    }, () => {
+    }, (error) => {
+      console.error("Firestore Marketplace Error:", error);
       setLoadingFirestore(false);
     });
     return unsub;

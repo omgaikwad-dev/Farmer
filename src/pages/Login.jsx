@@ -39,7 +39,11 @@ export default function Login() {
       addToast('Welcome! 🌱', 'success');
       navigate('/dashboard');
     } catch (error) {
-      addToast(error.message || 'Google login failed', 'error');
+      if (error.code === 'auth/unauthorized-domain') {
+        addToast('Please add this domain to Firebase Console > Authentication > Settings > Authorized Domains', 'error');
+      } else {
+        addToast(error.message || 'Google login failed', 'error');
+      }
     }
   };
 

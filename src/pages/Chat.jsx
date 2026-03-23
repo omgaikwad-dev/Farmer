@@ -175,7 +175,7 @@ export default function Chat() {
         </div>
       )}
       <motion.div
-        className="chat-container"
+        className={`chat-container ${selectedContact ? 'chat-active' : ''}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -228,6 +228,9 @@ export default function Chat() {
             <>
               <div className="chat-main-header">
                 <div className="chat-user">
+                  <button className="mobile-back-btn" onClick={() => setSelectedContact(null)}>
+                    ‹ Back
+                  </button>
                   <div className="chat-user-avatar-wrap">
                     <span className="chat-user-avatar">{selectedContact.avatar}</span>
                     <span className={`online-dot ${selectedContact.online ? 'online' : ''}`} />
