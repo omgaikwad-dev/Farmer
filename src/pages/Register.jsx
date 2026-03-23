@@ -18,6 +18,20 @@ export default function Register() {
   const { signup, loginWithGoogle } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    if (window.innerWidth <= 768) return;
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    const x = (clientX / innerWidth - 0.5) * 10;
+    const y = (clientY / innerHeight - 0.5) * -10;
+    setMousePos({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setMousePos({ x: 0, y: 0 });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,10 +73,12 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
       <div className="auth-bg">
-        <div className="auth-shape auth-shape-1"></div>
-        <div className="auth-shape auth-shape-2"></div>
+        <video className="auth-video" autoPlay loop muted playsInline>
+          <source src="https://www.pexels.com/download/video/5285672/" type="video/mp4" />
+        </video>
+        <div className="auth-video-overlay"></div>
       </div>
 
       <motion.div
@@ -70,6 +86,9 @@ export default function Register() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        style={{
+          transform: `perspective(1000px) rotateY(${mousePos.x}deg) rotateX(${mousePos.y}deg)`,
+        }}
       >
         <div className="auth-left">
           <div className="auth-welcome">

@@ -9,6 +9,9 @@ import {
   FiArrowUpRight, FiArrowDownRight, FiTruck, FiDollarSign,
   FiHeart, FiNavigation
 } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { farmerDashboardStats, buyerDashboardStats, transporterDashboardStats } from '../data/mockData';
 import './Dashboard.css';
@@ -72,7 +75,40 @@ const statusColors = {
 };
 
 // ══════════════════ FARMER DASHBOARD ══════════════════
-function FarmerDashboard({ stats, name }) {
+function FarmerDashboard({ stats: initialStats, name, uid }) {
+  const [stats, setStats] = useState(initialStats);
+  const [recentLiveOrders, setRecentLiveOrders] = useState(initialStats.recentOrders);
+
+  useEffect(() => {
+    if (!uid) return;
+    const q = query(collection(db, 'orders'), where('farmerId', '==', uid));
+    const unsub = onSnapshot(q, (snap) => {
+      let ordersList = [];
+      let totalSales = 0;
+      snap.forEach(doc => {
+        const d = doc.data();
+        ordersList.push({
+          id: doc.id.substring(0, 6).toUpperCase(),
+          buyer: d.buyerName || 'Guest',
+          crop: d.productName,
+          qty: `${d.quantity} ${d.unit}`,
+          amount: d.totalAmount || 0,
+          status: d.status || 'pending',
+          date: d.createdAt?.toDate().toLocaleDateString('en-IN') || new Date().toLocaleDateString('en-IN'),
+          ts: d.createdAt?.toMillis() || 0
+        });
+        totalSales += (d.totalAmount || 0);
+      });
+      ordersList.sort((a, b) => b.ts - a.ts);
+      
+      if (ordersList.length > 0) {
+        setRecentLiveOrders(ordersList.slice(0, 5));
+        setStats(prev => ({ ...prev, totalOrders: ordersList.length, totalSales: totalSales > 0 ? totalSales : prev.totalSales }));
+      }
+    }, (err) => console.warn('Live orders err:', err));
+    return unsub;
+  }, [uid]);
+
   const statCards = [
     { label: 'Total Revenue', value: `₹${(stats.totalSales / 1000).toFixed(0)}K`, change: '+23%', up: true, icon: <FiTrendingUp />, color: '#22c55e', bg: '#f0fdf4' },
     { label: 'Total Orders', value: stats.totalOrders, change: '+12%', up: true, icon: <FiShoppingCart />, color: '#3b82f6', bg: '#eff6ff' },
@@ -131,13 +167,46 @@ function FarmerDashboard({ stats, name }) {
         </motion.div>
       </div>
 
-      <RecentOrdersTable orders={stats.recentOrders} role="farmer" />
+      <RecentOrdersTable orders={recentLiveOrders} role="farmer" />
     </div>
   );
 }
 
 // ══════════════════ BUYER DASHBOARD ══════════════════
-function BuyerDashboard({ stats, name }) {
+function BuyerDashboard({ stats: initialStats, name, uid }) {
+  const [stats, setStats] = useState(initialStats);
+  const [recentLiveOrders, setRecentLiveOrders] = useState(initialStats.recentOrders);
+
+  useEffect(() => {
+    if (!uid) return;
+    const q = query(collection(db, 'orders'), where('buyerId', '==', uid));
+    const unsub = onSnapshot(q, (snap) => {
+      let ordersList = [];
+      let totalSpent = 0;
+      snap.forEach(doc => {
+        const d = doc.data();
+        ordersList.push({
+          id: doc.id.substring(0, 6).toUpperCase(),
+          farmer: d.farmerName || 'Farmer',
+          crop: d.productName,
+          qty: `${d.quantity} ${d.unit}`,
+          amount: d.totalAmount || 0,
+          status: d.status || 'pending',
+          date: d.createdAt?.toDate().toLocaleDateString('en-IN') || new Date().toLocaleDateString('en-IN'),
+          ts: d.createdAt?.toMillis() || 0
+        });
+        totalSpent += (d.totalAmount || 0);
+      });
+      ordersList.sort((a, b) => b.ts - a.ts);
+      
+      if (ordersList.length > 0) {
+        setRecentLiveOrders(ordersList.slice(0, 5));
+        setStats(prev => ({ ...prev, totalOrders: ordersList.length, totalSpent: totalSpent > 0 ? totalSpent : prev.totalSpent }));
+      }
+    }, (err) => console.warn('Live orders err:', err));
+    return unsub;
+  }, [uid]);
+
   const statCards = [
     { label: 'Total Spent', value: `₹${(stats.totalSpent / 1000).toFixed(0)}K`, change: '+18%', up: true, icon: <FiDollarSign />, color: '#3b82f6', bg: '#eff6ff' },
     { label: 'Total Orders', value: stats.totalOrders, change: '+8%', up: true, icon: <FiShoppingCart />, color: '#22c55e', bg: '#f0fdf4' },
@@ -196,7 +265,7 @@ function BuyerDashboard({ stats, name }) {
         </motion.div>
       </div>
 
-      <RecentOrdersTable orders={stats.recentOrders} role="buyer" />
+      <RecentOrdersTable orders={recentLiveOrders} role="buyer" />
     </div>
   );
 }
@@ -350,8 +419,10 @@ export default function Dashboard() {
   role = role || 'buyer';
   name = name || 'User';
 
-  if (role === 'farmer')      return <FarmerDashboard      stats={farmerDashboardStats}      name={name} />;
-  if (role === 'transporter') return <TransporterDashboard stats={transporterDashboardStats} name={name} />;
-  return <BuyerDashboard stats={buyerDashboardStats} name={name} />;
+  const uid = userProfile?.uid || JSON.parse(localStorage.getItem('fc_user_profile') || '{}')?.uid;
+
+  if (role === 'farmer')      return <FarmerDashboard      stats={farmerDashboardStats}      name={name} uid={uid} />;
+  if (role === 'transporter') return <TransporterDashboard stats={transporterDashboardStats} name={name} uid={uid} />;
+  return <BuyerDashboard stats={buyerDashboardStats} name={name} uid={uid} />;
 }
 

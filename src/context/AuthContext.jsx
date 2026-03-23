@@ -22,26 +22,28 @@ const PROFILE_CACHE_KEY = 'fc_user_profile';
 
 function cacheProfile(profile) {
   try {
-    if (profile) {
-      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile));
+    if (profile && profile.uid) {
+      localStorage.setItem(`fc_profile_${profile.uid}`, JSON.stringify(profile));
+      // Also store a quick reference for the dashboard default
+      localStorage.setItem('fc_user_profile', JSON.stringify(profile));
     }
   } catch (_) { /* quota exceeded, ignore */ }
 }
 
 function getCachedProfile(uid) {
   try {
-    const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+    const raw = localStorage.getItem(`fc_profile_${uid}`);
     if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    // Only return if it matches the current user
-    return parsed?.uid === uid ? parsed : null;
+    return JSON.parse(raw);
   } catch (_) {
     return null;
   }
 }
 
 function clearCachedProfile() {
-  try { localStorage.removeItem(PROFILE_CACHE_KEY); } catch (_) {}
+  // Keep cache intact so subsequent logins still know the user's role 
+  // even if Firestore rules are restricting access.
+  try { localStorage.removeItem('fc_user_profile'); } catch (_) {}
 }
 
 /* ───── Fetch Firestore profile with timeout ───── */

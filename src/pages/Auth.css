@@ -12,8 +12,28 @@
 .auth-bg {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   overflow: hidden;
+  z-index: 0;
+}
+
+.auth-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.auth-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); /* Darkens the video */
+  backdrop-filter: blur(4px); /* Slight blur for premium look */
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .auth-shape {
@@ -42,24 +62,30 @@
   display: flex;
   width: 100%;
   max-width: 960px;
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.85); /* Glassmorphism */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   position: relative;
   z-index: 1;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  /* 3D Interactive properties */
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  transform-style: preserve-3d;
 }
 
 .auth-left {
   flex: 1;
-  background: linear-gradient(135deg, #14532d, #166534, #15803d);
+  background: linear-gradient(135deg, rgba(20, 83, 45, 0.85), rgba(21, 128, 61, 0.75));
   padding: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .auth-left::before {

@@ -14,10 +14,10 @@ const features = [
 ];
 
 const stats = [
-  { number: '10,000+', label: 'Active Farmers', icon: '👨‍🌾' },
-  { number: '5,000+',  label: 'Happy Buyers',   icon: '🏪' },
-  { number: '₹50Cr+',  label: 'Transactions',   icon: '💰' },
-  { number: '500+',    label: 'Cities Covered',  icon: '🗺️' },
+  { value: 10000, suffix: '+', label: 'Active Farmers', icon: '👨‍🌾' },
+  { value: 5000,  suffix: '+', label: 'Happy Buyers',   icon: '🏪' },
+  { value: 50,    prefix: '₹', suffix: 'Cr+', label: 'Transactions',   icon: '💰' },
+  { value: 500,   suffix: '+', label: 'Cities Covered',  icon: '🗺️' },
 ];
 
 const steps = [
@@ -58,6 +58,36 @@ function useInView(threshold = 0.15) {
   }, [threshold]);
 
   return [ref, visible];
+}
+
+/* ─────── Animated Counter ─────── */
+function AnimatedCounter({ value, prefix = '', suffix = '', duration = 2000 }) {
+  const [count, setCount] = useState(0);
+  const [ref, visible] = useInView(0.5);
+
+  useEffect(() => {
+    if (!visible) return;
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      // Ease out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * value));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        setCount(value);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [value, duration, visible]);
+
+  return (
+    <span ref={ref}>
+      {prefix}{count.toLocaleString('en-IN')}{suffix}
+    </span>
+  );
 }
 
 /* ─────── Hero Cards — static positions, pure CSS animation ─────── */
@@ -285,7 +315,9 @@ export default function Landing() {
             {stats.map((s, i) => (
               <div key={i} className="stat-item" style={{ animationDelay: `${i * 0.1}s` }}>
                 <div className="stat-icon">{s.icon}</div>
-                <div className="stat-number">{s.number}</div>
+                <div className="stat-number">
+                  <AnimatedCounter value={s.value} prefix={s.prefix} suffix={s.suffix} />
+                </div>
                 <div className="stat-label">{s.label}</div>
               </div>
             ))}
