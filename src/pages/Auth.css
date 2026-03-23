@@ -62,9 +62,9 @@
   display: flex;
   width: 100%;
   max-width: 960px;
-  background: rgba(255, 255, 255, 0.85); /* Glassmorphism */
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(255, 255, 255, 0.1); /* Highly transparent glass */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -78,7 +78,7 @@
 
 .auth-left {
   flex: 1;
-  background: linear-gradient(135deg, rgba(20, 83, 45, 0.85), rgba(21, 128, 61, 0.75));
+  background: linear-gradient(135deg, rgba(20, 83, 45, 0.3), rgba(21, 128, 61, 0.1));
   padding: 48px;
   display: flex;
   align-items: center;
@@ -98,6 +98,7 @@
 .auth-welcome {
   position: relative;
   color: white;
+  font-weight: 600;
 }
 
 .auth-logo {
@@ -114,8 +115,9 @@
 }
 
 .auth-welcome p {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
   line-height: 1.6;
   margin-bottom: 32px;
 }
@@ -130,13 +132,14 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .auth-feature span {
   color: #4ade80;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .auth-right {
@@ -145,6 +148,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.2); /* Much more transparent */
 }
 
 .auth-form-container {
@@ -160,9 +164,16 @@
 }
 
 .auth-subtitle {
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--text-primary);
+  opacity: 0.9;
+  font-size: 0.95rem;
+  font-weight: 600;
   margin-bottom: 28px;
+}
+
+.auth-form label {
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .auth-form {
@@ -194,6 +205,7 @@
 .input-with-icon .input-field {
   padding-left: 42px;
   width: 100%;
+  font-weight: 600;
 }
 
 .password-toggle {
@@ -232,8 +244,10 @@
 }
 
 .auth-divider span {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  opacity: 0.8;
   white-space: nowrap;
 }
 
@@ -262,13 +276,15 @@
 .auth-switch {
   text-align: center;
   margin-top: 24px;
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  opacity: 0.9;
 }
 
 .auth-switch a {
-  color: var(--primary-600);
-  font-weight: 600;
+  color: var(--primary-700);
+  font-weight: 800;
 }
 
 .auth-switch a:hover {

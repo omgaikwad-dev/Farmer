@@ -50,7 +50,7 @@ export default function Marketplace() {
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('rating');
+  const [sortBy, setSortBy] = useState('newest');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [firestoreProducts, setFirestoreProducts] = useState([]);
@@ -94,6 +94,12 @@ export default function Marketplace() {
     if (selectedCategory !== 'all') {
       result = result.filter(p => p.category === selectedCategory);
     }
+    if (sortBy === 'newest') result.sort((a, b) => {
+      // Prioritize live firestore items at the top
+      if (a.fromFirestore && !b.fromFirestore) return -1;
+      if (!a.fromFirestore && b.fromFirestore) return 1;
+      return 0; // retain chronological add order for live items if they have timestamps
+    });
     if (sortBy === 'price-low') result.sort((a, b) => a.price - b.price);
     if (sortBy === 'price-high') result.sort((a, b) => b.price - a.price);
     if (sortBy === 'rating') result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -181,6 +187,7 @@ export default function Marketplace() {
           onChange={(e) => setSortBy(e.target.value)}
           id="marketplace-sort"
         >
+          <option value="newest">New Arrivals 🔥</option>
           <option value="rating">Highest Rated</option>
           <option value="name">Sort by Name</option>
           <option value="price-low">Price: Low to High</option>
@@ -253,15 +260,15 @@ export default function Marketplace() {
                     ₹{product.price}<span>/{product.unit}</span>
                   </div>
                   <div className="product-actions">
-                    {role !== 'farmer' ? (
+                    {userProfile?.uid === product.farmerId ? (
+                      <span className="your-product-tag">📦 Your listing</span>
+                    ) : (
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={() => openOrder(product)}
                       >
                         <FiShoppingCart /> Order
                       </button>
-                    ) : (
-                      <span className="your-product-tag">📦 Your listing</span>
                     )}
                   </div>
                 </div>
