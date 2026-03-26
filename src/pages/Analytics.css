@@ -1,8 +1,9 @@
-/* ===== Analytics ===== */
 .analytics-page {
   padding: 32px;
   max-width: 1200px;
   margin: 0 auto;
+  min-width: 0;
+  width: 100%;
 }
 
 .an-header {
@@ -53,6 +54,8 @@
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-lg);
   padding: 24px;
+  min-width: 0;
+  width: 100%;
 }
 
 .an-chart-card h3 {
@@ -61,7 +64,11 @@
   margin-bottom: 20px;
 }
 
-.an-chart-body { height: 280px; }
+.an-chart-body {
+  height: 280px;
+  position: relative;
+  width: 100%;
+}
 .an-chart-body.doughnut { display: flex; align-items: center; justify-content: center; }
 
 /* Top Crops */

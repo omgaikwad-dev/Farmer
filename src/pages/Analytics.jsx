@@ -151,9 +151,10 @@ export default function Analytics() {
           <h3>🥧 Sales by Category</h3>
           <div className="an-chart-body doughnut">
             <Doughnut data={categoryData} options={{
-              ...chartOpts,
+              responsive: true,
+              maintainAspectRatio: false,
               plugins: {
-                ...chartOpts.plugins,
+                tooltip: chartOpts.plugins.tooltip,
                 legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } }
               },
               cutout: '65%'
