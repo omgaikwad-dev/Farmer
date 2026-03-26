@@ -16,11 +16,6 @@
   overflow-x: hidden;
 }
 
-/* When sidebar is collapsed on desktop, main shifts left */
-.sidebar.collapsed ~ .app-main {
-  /* This won't work because .sidebar and .app-main are siblings in .app-layout */
-}
-
 /* Loading states */
 .loading-content {
   display: flex;

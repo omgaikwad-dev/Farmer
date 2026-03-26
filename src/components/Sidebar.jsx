@@ -14,7 +14,6 @@ const getNavItems = (role) => {
   if (role === 'farmer') {
     return [
       { path: '/dashboard',     icon: <FiHome />,         label: 'Dashboard' },
-      { path: '/marketplace',   icon: <FiShoppingBag />,  label: 'Marketplace' },
       { path: '/my-products',   icon: <FiPackage />,      label: 'My Products' },
       { path: '/price-insights',icon: <FiTrendingUp />,   label: 'Price Insights' },
       { path: '/weather',       icon: <FiSun />,          label: 'Weather' },

@@ -122,11 +122,17 @@ function AppRoutes() {
       {/* Protected — accessible by all roles */}
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard"  element={<Dashboard />} />
-        <Route path="/marketplace"element={<Marketplace />} />
         <Route path="/transport"  element={<Transport />} />
         <Route path="/chat"       element={<Chat />} />
         <Route path="/ratings"    element={<Ratings />} />
         <Route path="/profile"    element={<Profile />} />
+
+        {/* Buyer-only routes */}
+        <Route path="/marketplace" element={
+          <RoleRoute allowedRoles={['buyer']}>
+            <Marketplace />
+          </RoleRoute>
+        } />
 
         {/* Farmer-only routes */}
         <Route path="/my-products" element={
