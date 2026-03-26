@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheck, FiCloud } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheck, FiCloud, FiAlertCircle } from 'react-icons/fi';
 import { collection, addDoc, onSnapshot, query, where, serverTimestamp, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cropCategories } from '../data/mockData';
@@ -56,6 +56,7 @@ export default function MyProducts() {
       return;
     }
     setSaving(true);
+    const autoImageUrl = `https://source.unsplash.com/400x300/?${encodeURIComponent(form.name.toLowerCase().trim())},food,farm`;
     const productData = {
       ...form,
       price: Number(form.price),
@@ -63,7 +64,7 @@ export default function MyProducts() {
       farmerName: userProfile?.name || 'Farmer',
       farmerId: currentUser?.uid || 'unknown',
       rating: editProduct?.rating || 0,
-      image: categoryImages[form.category] || categoryImages.vegetables,
+      image: autoImageUrl,
       available: true,
       harvestDate: new Date().toISOString().split('T')[0],
       createdAt: serverTimestamp()
@@ -136,6 +137,14 @@ export default function MyProducts() {
         </div>
       </motion.div>
 
+      {/* Inventory Alerts */}
+      {products.some(p => p.quantity < 20) && (
+        <motion.div className="alert-banner" style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <FiAlertCircle size={20} />
+          <strong>Inventory Alert:</strong> You have items running low on stock! Please restock soon.
+        </motion.div>
+      )}
+
       {/* Products List */}
       <div className="my-products-grid">
         <AnimatePresence>
@@ -163,7 +172,9 @@ export default function MyProducts() {
                   <h3>{product.name}</h3>
                   <div className="mpc-meta">
                     <span className="mpc-price">₹{product.price}/{product.unit}</span>
-                    <span className="mpc-qty">{product.quantity} {product.unit}</span>
+                    <span className="mpc-qty" style={{ color: product.quantity < 20 ? '#ef4444' : 'inherit', fontWeight: product.quantity < 20 ? 'bold' : 'normal' }}>
+                      {product.quantity} {product.unit} {product.quantity < 20 && '(Low Stock)'}
+                    </span>
                   </div>
                   <p className="mpc-location">📍 {product.location}</p>
                   <div className="mpc-actions">

@@ -657,6 +657,226 @@
   color: var(--primary-700);
 }
 
+/* ═══ Sub-Transporter Assignment ═══ */
+.assign-section {
+  border-top: 1px solid var(--neutral-200);
+  padding-top: 20px;
+  margin-bottom: 16px;
+}
+
+.assign-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.assign-header h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assign-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.assigned-driver-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #f0fdf4;
+  border: 2px solid #bbf7d0;
+  border-radius: var(--radius-lg);
+}
+
+.adc-avatar {
+  font-size: 2rem;
+}
+
+.adc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adc-info strong {
+  font-size: 0.95rem;
+}
+
+.adc-info span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.adc-phone {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem !important;
+  color: var(--primary-600) !important;
+}
+
+.adc-status {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.adc-status.assigned {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Status Actions Bar */
+.status-actions-bar {
+  padding: 16px 0;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.status-actions-label {
+  font-weight: 700;
+  color: var(--text);
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+/* ═══ Sub-Transporter Assign Modal ═══ */
+.assign-modal {
+  max-width: 750px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.assign-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px 12px;
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 5;
+}
+
+.assign-modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.assign-modal-header .modal-close {
+  position: static;
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--neutral-200);
+  background: var(--neutral-50);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.assign-modal-desc {
+  padding: 0 28px 20px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.sub-transporter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 0 28px 28px;
+}
+
+.st-card {
+  background: var(--bg-card);
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.st-card:hover:not(.st-unavailable) {
+  border-color: var(--primary-400);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.12);
+  transform: translateY(-2px);
+}
+
+.st-unavailable {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.st-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.st-avatar {
+  font-size: 2rem;
+}
+
+.st-info {
+  flex: 1;
+}
+
+.st-info strong {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.st-vehicle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.st-badge {
+  font-size: 0.7rem !important;
+}
+
+.st-card-bottom {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.st-stat {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--neutral-50);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.st-assign-btn {
+  width: 100%;
+}
+
 /* ═══════════ Responsive ═══════════ */
 @media (max-width: 1024px) {
   .trip-stats-grid {
@@ -667,6 +887,9 @@
   }
   .trip-filter-bar {
     flex-wrap: wrap;
+  }
+  .sub-transporter-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -719,4 +942,15 @@
     padding: 6px 12px;
     font-size: 0.8rem;
   }
+  .sub-transporter-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px 16px;
+  }
+  .assign-modal-header {
+    padding: 16px;
+  }
+  .assign-modal-desc {
+    padding: 0 16px 16px;
+  }
 }
+

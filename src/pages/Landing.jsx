@@ -5,35 +5,35 @@ import './Landing.css';
 
 /* ─────── Static data ─────── */
 const features = [
-  { icon: '📈', title: 'AI Price Insights',   desc: 'Get real-time AI-powered price predictions to maximize your profit margins.',          color: '#22c55e', bg: '#f0fdf4' },
-  { icon: '🚫', title: 'No Middlemen',         desc: 'Connect directly with buyers and sellers. Keep 100% of your hard-earned profit.',       color: '#3b82f6', bg: '#eff6ff' },
-  { icon: '🚚', title: 'Logistics Support',    desc: 'Book transport, track deliveries, and estimate costs all in one place.',                color: '#f97316', bg: '#fff7ed' },
-  { icon: '📱', title: 'Easy to Use',          desc: 'Simple interface designed for everyone. List products in under 60 seconds.',            color: '#a855f7', bg: '#faf5ff' },
-  { icon: '⭐', title: 'Trust System',         desc: 'Verified ratings and reviews build transparent farmer-buyer relationships.',            color: '#eab308', bg: '#fefce8' },
-  { icon: '🌍', title: 'Growing Community',    desc: 'Join thousands of farmers and buyers already transforming agriculture.',               color: '#06b6d4', bg: '#ecfeff' },
+  { icon: '📈', title: 'AI Price Insights', desc: 'Get real-time AI-powered price predictions to maximize your profit margins.', color: '#22c55e', bg: '#f0fdf4' },
+  { icon: '🚫', title: 'No Middlemen', desc: 'Connect directly with buyers and sellers. Keep 100% of your hard-earned profit.', color: '#3b82f6', bg: '#eff6ff' },
+  { icon: '🚚', title: 'Logistics Support', desc: 'Book transport, track deliveries, and estimate costs all in one place.', color: '#f97316', bg: '#fff7ed' },
+  { icon: '📱', title: 'Easy to Use', desc: 'Simple interface designed for everyone. List products in under 60 seconds.', color: '#a855f7', bg: '#faf5ff' },
+  { icon: '⭐', title: 'Trust System', desc: 'Verified ratings and reviews build transparent farmer-buyer relationships.', color: '#eab308', bg: '#fefce8' },
+  { icon: '🌍', title: 'Growing Community', desc: 'Join thousands of farmers and buyers already transforming agriculture.', color: '#06b6d4', bg: '#ecfeff' },
 ];
 
 const stats = [
   { value: 10000, suffix: '+', label: 'Active Farmers', icon: '👨‍🌾' },
-  { value: 5000,  suffix: '+', label: 'Happy Buyers',   icon: '🏪' },
-  { value: 50,    prefix: '₹', suffix: 'Cr+', label: 'Transactions',   icon: '💰' },
-  { value: 500,   suffix: '+', label: 'Cities Covered',  icon: '🗺️' },
+  { value: 5000, suffix: '+', label: 'Happy Buyers', icon: '🏪' },
+  { value: 50, prefix: '₹', suffix: 'Cr+', label: 'Transactions', icon: '💰' },
+  { value: 500, suffix: '+', label: 'Cities Covered', icon: '🗺️' },
 ];
 
 const steps = [
-  { num: '01', title: 'Register',        desc: 'Create your account as a farmer, buyer or transporter in minutes', icon: '📝', color: '#22c55e' },
-  { num: '02', title: 'List & Browse',   desc: 'Farmers list produce, buyers browse thousands of fresh offerings',  icon: '🛒', color: '#3b82f6' },
-  { num: '03', title: 'Connect & Order', desc: 'Direct communication and transparent, fair pricing for all',        icon: '🤝', color: '#f97316' },
-  { num: '04', title: 'Deliver & Earn',  desc: 'Book transport, track delivery, receive payments instantly',        icon: '💰', color: '#a855f7' },
+  { num: '01', title: 'Register', desc: 'Create your account as a farmer, buyer or transporter in minutes', icon: '📝', color: '#22c55e' },
+  { num: '02', title: 'List & Browse', desc: 'Farmers list produce, buyers browse thousands of fresh offerings', icon: '🛒', color: '#3b82f6' },
+  { num: '03', title: 'Connect & Order', desc: 'Direct communication and transparent, fair pricing for all', icon: '🤝', color: '#f97316' },
+  { num: '04', title: 'Deliver & Earn', desc: 'Book transport, track delivery, receive payments instantly', icon: '💰', color: '#a855f7' },
 ];
 
 const testimonials = [
-  { name: 'Rajesh Patil',  role: 'Farmer, Maharashtra', text: 'FarmConnect helped me increase my income by 40%. No more depending on mandis!',           avatar: '👨‍🌾', rating: 5 },
-  { name: 'Priya Sharma',  role: 'Retailer, Delhi',     text: "I get the freshest produce at the best prices. The quality is absolutely unmatched.",     avatar: '🏪',  rating: 5 },
-  { name: 'Amit Kumar',    role: 'Farmer, Punjab',       text: 'The AI price insights helped me decide when to sell. Complete game changer!',             avatar: '👨‍🌾', rating: 5 },
-  { name: 'Sunita Devi',   role: 'Buyer, Mumbai',        text: 'Direct farm connection means I always get the freshest produce. Love it!',               avatar: '👩‍💼', rating: 5 },
-  { name: 'Mohan Lal',     role: 'Transporter, Gujarat', text: "Earning extra income by transporting produce. The app made it so simple.",               avatar: '🚛',  rating: 5 },
-  { name: 'Kavita Nair',   role: 'Hotel Owner, Kochi',   text: 'Our hotel now sources directly from farmers. Food quality has gone up significantly!',   avatar: '🏨',  rating: 5 },
+  { name: 'Rajesh Patil', role: 'Farmer, Maharashtra', text: 'FarmConnect helped me increase my income by 40%. No more depending on mandis!', avatar: '👨‍🌾', rating: 5 },
+  { name: 'Priya Sharma', role: 'Retailer, Delhi', text: "I get the freshest produce at the best prices. The quality is absolutely unmatched.", avatar: '🏪', rating: 5 },
+  { name: 'Amit Kumar', role: 'Farmer, Punjab', text: 'The AI price insights helped me decide when to sell. Complete game changer!', avatar: '👨‍🌾', rating: 5 },
+  { name: 'Sunita Devi', role: 'Buyer, Mumbai', text: 'Direct farm connection means I always get the freshest produce. Love it!', avatar: '👩‍💼', rating: 5 },
+  { name: 'Mohan Lal', role: 'Transporter, Gujarat', text: "Earning extra income by transporting produce. The app made it so simple.", avatar: '🚛', rating: 5 },
+  { name: 'Kavita Nair', role: 'Hotel Owner, Kochi', text: 'Our hotel now sources directly from farmers. Food quality has gone up significantly!', avatar: '🏨', rating: 5 },
 ];
 
 /* ─────── Lightweight InView hook (replaces framer-motion viewport tracking) ─────── */
@@ -227,7 +227,7 @@ export default function Landing() {
   }, []);
 
   const goRegister = useCallback(() => navigate('/register'), [navigate]);
-  const goLogin    = useCallback(() => navigate('/login'),    [navigate]);
+  const goLogin = useCallback(() => navigate('/login'), [navigate]);
 
   return (
     <div className="landing">
@@ -445,7 +445,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>© 2026 FarmConnect. Made with ❤️ for Indian Farmers.</p>
+            <p>© 2026 FarmConnect. Made By Sunny for Indian Farmers.</p>
           </div>
         </div>
       </footer>

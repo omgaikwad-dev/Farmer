@@ -459,6 +459,7 @@ export const dashboardStats = farmerDashboardStats;
 export const transportOptions = [
   { id: 't1', type: 'Mini Truck', capacity: '500 kg', pricePerKm: 12, icon: '🛻', available: true },
   { id: 't2', type: 'Pickup Truck', capacity: '1000 kg', pricePerKm: 18, icon: '🚛', available: true },
-  { id: 't3', type: 'Large Truck', capacity: '5000 kg', pricePerKm: 25, icon: '🚚', available: false },
-  { id: 't4', type: 'Refrigerated Van', capacity: '800 kg', pricePerKm: 30, icon: '🧊', available: true }
+  { id: 't3', type: 'Large Truck', capacity: '5000 kg', pricePerKm: 25, icon: '🚚', available: true },
+  { id: 't4', type: 'Refrigerated Van', capacity: '800 kg', pricePerKm: 30, icon: '🧊', available: true },
+  { id: 't5', type: 'Bike Delivery', capacity: '50 kg', pricePerKm: 8, icon: '🏍️', available: true }
 ];

@@ -1,33 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSend, FiSearch, FiMoreVertical, FiUser, FiCircle } from 'react-icons/fi';
+import { FiSend, FiSearch, FiUser } from 'react-icons/fi';
 import { ref, push, onValue, off, serverTimestamp, set, onDisconnect } from 'firebase/database';
-import { rtdb } from '../firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import { rtdb, db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import './Chat.css';
 
-// Preset conversations based on role pairings
 const generateChatId = (uid1, uid2) => [uid1, uid2].sort().join('_');
 
-// Demo contacts list per role
-const demoContacts = {
-  farmer: [
-    { id: 'buyer_demo1', name: 'Fresh Mart Ltd.', role: 'Buyer', avatar: '🏪', online: true },
-    { id: 'buyer_demo2', name: 'Anand Hotels', role: 'Buyer', avatar: '🏨', online: false },
-    { id: 'transport_demo1', name: 'Quick Logistics', role: 'Transporter', avatar: '🚛', online: true },
-    { id: 'buyer_demo3', name: 'Green Basket Co.', role: 'Buyer', avatar: '🛒', online: false },
-  ],
-  buyer: [
-    { id: 'farmer_demo1', name: 'Rajesh Patil', role: 'Farmer', avatar: '👨‍🌾', online: true },
-    { id: 'farmer_demo2', name: 'Amit Singh', role: 'Farmer', avatar: '👨‍🌾', online: true },
-    { id: 'farmer_demo3', name: 'Suresh Deshmukh', role: 'Farmer', avatar: '👨‍🌾', online: false },
-    { id: 'transport_demo1', name: 'Express Transport', role: 'Transporter', avatar: '🚛', online: false },
-  ],
-  transporter: [
-    { id: 'farmer_demo1', name: 'Rajesh Patil', role: 'Farmer', avatar: '👨‍🌾', online: true },
-    { id: 'farmer_demo2', name: 'Gopal Sharma', role: 'Farmer', avatar: '👨‍🌾', online: false },
-    { id: 'buyer_demo1', name: 'Fresh Mart Ltd.', role: 'Buyer', avatar: '🏪', online: true },
-  ]
+const roleEmoji = {
+  farmer: '👨‍🌾',
+  buyer: '🏪',
+  transporter: '🚛',
 };
 
 export default function Chat() {
@@ -38,14 +23,99 @@ export default function Chat() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sending, setSending] = useState(false);
   const [rtdbError, setRtdbError] = useState(null);
+  const [allUsers, setAllUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [onlineUsers, setOnlineUsers] = useState({});
   const messagesEndRef = useRef(null);
   const currentListenerRef = useRef(null);
 
   const role = userProfile?.role || 'buyer';
-  const contacts = demoContacts[role] || demoContacts.buyer;
+
+  // Load all registered users from Firestore
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        const users = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d.uid !== currentUser?.uid) {
+            users.push({
+              id: d.uid,
+              name: d.name || 'User',
+              role: d.role || 'buyer',
+              avatar: roleEmoji[d.role] || '👤',
+              email: d.email || '',
+            });
+          }
+        });
+        setAllUsers(users);
+      } catch (err) {
+        console.warn('[Chat] Could not load users from Firestore:', err.message);
+      }
+      setLoadingUsers(false);
+    }
+    if (currentUser) fetchUsers();
+  }, [currentUser]);
+
+  // Listen to presence changes for online status
+  useEffect(() => {
+    const presRef = ref(rtdb, 'presence');
+    const unsub = onValue(presRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      setOnlineUsers(data);
+    }, () => {});
+    return () => off(presRef, 'value', unsub);
+  }, []);
+
+  // Check if we were redirected from Marketplace "Chat with Farmer"
+  useEffect(() => {
+    try {
+      const chatTarget = JSON.parse(localStorage.getItem('fc_chat_target') || 'null');
+      if (chatTarget && chatTarget.name) {
+        const farmerContact = {
+          id: chatTarget.farmerId || `farmer_${chatTarget.name.replace(/\s/g, '_').toLowerCase()}`,
+          name: chatTarget.name,
+          role: 'Farmer',
+          avatar: '👨‍🌾',
+          product: chatTarget.product || ''
+        };
+        // Auto-select this contact
+        setSelectedContact(farmerContact);
+        localStorage.removeItem('fc_chat_target');
+      }
+    } catch (e) {
+      console.warn('Chat target parse err:', e);
+    }
+  }, []);
+
+  // Build contacts list: merge real users + injected farmer contact
+  const contacts = (() => {
+    const chatTarget = selectedContact;
+    
+    // Start with all real users
+    let list = allUsers.map(u => ({
+      ...u,
+      online: onlineUsers[u.id]?.online || false,
+    }));
+
+    // If we have a chat target that's not in the list, inject it at top
+    if (chatTarget && !list.find(c => c.id === chatTarget.id)) {
+      list = [{
+        id: chatTarget.id,
+        name: chatTarget.name,
+        role: chatTarget.role || 'Farmer',
+        avatar: chatTarget.avatar || '👨‍🌾',
+        online: onlineUsers[chatTarget.id]?.online || false,
+      }, ...list];
+    }
+
+    return list;
+  })();
 
   const filteredContacts = contacts.filter(c =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Auto-scroll to bottom when messages update
@@ -53,15 +123,15 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Set user presence — sanitize all values, Firebase RTDB does not accept undefined
+  // Set user presence
   useEffect(() => {
     if (!currentUser) return;
     try {
       const presenceRef = ref(rtdb, `presence/${currentUser.uid}`);
       set(presenceRef, {
-        online:   true,
-        name:     userProfile?.name  || currentUser?.displayName || 'User',
-        role:     userProfile?.role  || 'user',
+        online: true,
+        name: userProfile?.name || currentUser?.displayName || 'User',
+        role: userProfile?.role || 'user',
         lastSeen: serverTimestamp()
       });
       onDisconnect(presenceRef).update({ online: false, lastSeen: serverTimestamp() });
@@ -78,7 +148,6 @@ export default function Chat() {
       return;
     }
 
-    // Cleanup old listener
     if (currentListenerRef.current) {
       off(currentListenerRef.current);
     }
@@ -149,9 +218,9 @@ export default function Chat() {
 
   if (profileLoading) {
     return (
-      <div className="chat-page" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <div style={{ textAlign:'center', color:'var(--text-muted)' }}>
-          <div className="spinner" style={{ width:40, height:40, margin:'0 auto 12px' }} />
+      <div className="chat-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+          <div className="spinner" style={{ width: 40, height: 40, margin: '0 auto 12px' }} />
           <p>Loading messages…</p>
         </div>
       </div>
@@ -162,15 +231,15 @@ export default function Chat() {
     <div className="chat-page">
       {rtdbError && (
         <div style={{
-          background:'#fef2f2', border:'1px solid #fecaca',
-          borderRadius:'8px', padding:'10px 16px', marginBottom:'12px',
-          color:'#b91c1c', fontSize:'0.85rem', fontWeight:600,
-          display:'flex', alignItems:'center', gap:8
+          background: '#fef2f2', border: '1px solid #fecaca',
+          borderRadius: '8px', padding: '10px 16px', marginBottom: '12px',
+          color: '#b91c1c', fontSize: '0.85rem', fontWeight: 600,
+          display: 'flex', alignItems: 'center', gap: 8
         }}>
           ⚠️ {rtdbError}
           <button
             onClick={() => setRtdbError(null)}
-            style={{ marginLeft:'auto', background:'none', border:'none', cursor:'pointer', fontSize:'1rem' }}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem' }}
           >✕</button>
         </div>
       )}
@@ -196,29 +265,41 @@ export default function Chat() {
             />
           </div>
           <div className="contacts-list">
-            {filteredContacts.map(contact => (
-              <div
-                key={contact.id}
-                className={`contact-item ${selectedContact?.id === contact.id ? 'active' : ''}`}
-                onClick={() => setSelectedContact(contact)}
-              >
-                <div className="contact-avatar-wrap">
-                  <span className="contact-avatar">{contact.avatar}</span>
-                  <span className={`online-dot ${contact.online ? 'online' : ''}`} />
-                </div>
-                <div className="contact-info">
-                  <div className="contact-name-row">
-                    <span className="contact-name">{contact.name}</span>
-                  </div>
-                  <div className="contact-meta">
-                    <span className="contact-role-tag">{contact.role}</span>
-                    <span className={`contact-status ${contact.online ? 'text-green' : ''}`}>
-                      {contact.online ? 'Online' : 'Offline'}
-                    </span>
-                  </div>
-                </div>
+            {loadingUsers ? (
+              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
+                <div className="spinner" style={{ width: 24, height: 24, margin: '0 auto 8px' }} />
+                <p style={{ fontSize: '0.85rem' }}>Loading users...</p>
               </div>
-            ))}
+            ) : filteredContacts.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                <FiUser style={{ fontSize: '1.5rem', marginBottom: '8px', display: 'block', margin: '0 auto 8px' }} />
+                No users found
+              </div>
+            ) : (
+              filteredContacts.map(contact => (
+                <div
+                  key={contact.id}
+                  className={`contact-item ${selectedContact?.id === contact.id ? 'active' : ''}`}
+                  onClick={() => setSelectedContact(contact)}
+                >
+                  <div className="contact-avatar-wrap">
+                    <span className="contact-avatar">{contact.avatar}</span>
+                    <span className={`online-dot ${contact.online ? 'online' : ''}`} />
+                  </div>
+                  <div className="contact-info">
+                    <div className="contact-name-row">
+                      <span className="contact-name">{contact.name}</span>
+                    </div>
+                    <div className="contact-meta">
+                      <span className="contact-role-tag">{contact.role}</span>
+                      <span className={`contact-status ${contact.online ? 'text-green' : ''}`}>
+                        {contact.online ? 'Online' : 'Offline'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

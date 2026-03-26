@@ -15,6 +15,7 @@ import Chat from './pages/Chat';
 import Analytics from './pages/Analytics';
 import Ratings from './pages/Ratings';
 import Profile from './pages/Profile';
+import Chatbot from './components/Chatbot';
 import './App.css';
 
 // ——— Role access map ———
@@ -140,6 +141,7 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <AppRoutes />
+          <Chatbot />
         </ToastProvider>
       </AuthProvider>
     </Router>
