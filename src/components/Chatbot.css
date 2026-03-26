@@ -1,22 +1,21 @@
 .chatbot-floating-btn {
   position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 50px;
-  height: 50px;
+  bottom: 18px;
+  right: 18px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: linear-gradient(135deg, #166534, #22c55e);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.45), 0 0 0 4px rgba(34, 197, 94, 0.15);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.35);
   cursor: pointer;
   z-index: 9999;
   transition: all 0.3s ease;
   border: none;
-  animation: chatbot-pulse 2s infinite;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 @keyframes chatbot-pulse {
@@ -34,17 +33,17 @@
 }
 
 .chatbot-floating-btn:hover {
-  transform: scale(1.12) translateY(-5px);
+  transform: scale(1.08);
   background: linear-gradient(135deg, #14532d, #16a34a);
-  animation: none;
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.45);
 }
 
 /* Tooltip removed as per user request */
 
 .chatbot-window {
   position: fixed;
-  bottom: 110px;
-  right: 30px;
+  bottom: 74px;
+  right: 18px;
   width: 380px;
   height: 520px;
   background: var(--surface);
@@ -231,11 +230,25 @@
   background: var(--primary-dark);
 }
 
-@media (max-width: 480px) {
-  .chatbot-window {
-    width: calc(100vw - 40px);
-    right: 20px;
+@media (max-width: 768px) {
+  .chatbot-floating-btn {
     bottom: 90px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+  .chatbot-window {
+    width: calc(100vw - 32px);
+    right: 16px;
+    bottom: 145px;
     height: 60vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatbot-floating-btn {
+    bottom: 85px;
+    right: 14px;
   }
 }

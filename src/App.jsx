@@ -2,31 +2,44 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Sidebar from './components/Sidebar';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Marketplace from './pages/Marketplace';
-import MyProducts from './pages/MyProducts';
-import PriceInsights from './pages/PriceInsights';
-import Weather from './pages/Weather';
-import Transport from './pages/Transport';
-import Chat from './pages/Chat';
-import Analytics from './pages/Analytics';
-import Ratings from './pages/Ratings';
-import Profile from './pages/Profile';
-import Chatbot from './components/Chatbot';
+import { lazy, Suspense } from 'react';
 import './App.css';
 
-// ——— Role access map ———
-const roleAccess = {
-  '/my-products':    ['farmer'],
-  '/price-insights': ['farmer'],
-  '/weather':        ['farmer'],
-  '/analytics':      ['farmer', 'transporter'],
-};
+// ——— Lazy-load ALL page components ———
+// This means the browser only downloads the code for the page the user is actually visiting
+const Landing = lazy(() => import('./pages/Landing'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Marketplace = lazy(() => import('./pages/Marketplace'));
+const MyProducts = lazy(() => import('./pages/MyProducts'));
+const PriceInsights = lazy(() => import('./pages/PriceInsights'));
+const Weather = lazy(() => import('./pages/Weather'));
+const Transport = lazy(() => import('./pages/Transport'));
+const Chat = lazy(() => import('./pages/Chat'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const Ratings = lazy(() => import('./pages/Ratings'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Chatbot = lazy(() => import('./components/Chatbot'));
 
-// ——— Loading Screen ———
+// ——— Lightweight Suspense Fallback ———
+function PageLoader() {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      flexDirection: 'column',
+      gap: '12px'
+    }}>
+      <div className="spinner" style={{ width: 36, height: 36 }} />
+      <p style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.9rem' }}>Loading…</p>
+    </div>
+  );
+}
+
+// ——— Loading Screen (for auth check only) ———
 function LoadingScreen() {
   return (
     <div className="loading-overlay">
@@ -44,7 +57,6 @@ function LoadingScreen() {
 function ProtectedRoute() {
   const { currentUser, loading } = useAuth();
 
-  // Only block on auth loading — profile loading is handled per-page
   if (loading) return <LoadingScreen />;
   if (!currentUser) return <Navigate to="/login" replace />;
 
@@ -52,19 +64,19 @@ function ProtectedRoute() {
     <div className="app-layout">
       <Sidebar />
       <main className="app-main">
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );
 }
 
 // ——— Role Guard ———
-// Wraps a page and redirects if the user's role isn't allowed
 function RoleRoute({ allowedRoles, children }) {
   const { userProfile, loading, profileLoading } = useAuth();
 
   if (loading) return <LoadingScreen />;
-  // While profile is loading, show a brief spinner but don't block indefinitely
   if (profileLoading) return <LoadingScreen />;
 
   const role = userProfile?.role || 'buyer';
@@ -76,7 +88,7 @@ function RoleRoute({ allowedRoles, children }) {
   return children;
 }
 
-// ——— Public Route (redirect to dashboard if already logged in) ———
+// ——— Public Route ———
 function PublicRoute({ children }) {
   const { currentUser, loading } = useAuth();
 
@@ -91,9 +103,21 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public */}
-      <Route path="/"        element={<PublicRoute><Landing /></PublicRoute>} />
-      <Route path="/login"   element={<PublicRoute><Login /></PublicRoute>} />
-      <Route path="/register"element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/" element={
+        <PublicRoute>
+          <Suspense fallback={<PageLoader />}><Landing /></Suspense>
+        </PublicRoute>
+      } />
+      <Route path="/login" element={
+        <PublicRoute>
+          <Suspense fallback={<PageLoader />}><Login /></Suspense>
+        </PublicRoute>
+      } />
+      <Route path="/register" element={
+        <PublicRoute>
+          <Suspense fallback={<PageLoader />}><Register /></Suspense>
+        </PublicRoute>
+      } />
 
       {/* Protected — accessible by all roles */}
       <Route element={<ProtectedRoute />}>
@@ -141,7 +165,9 @@ export default function App() {
       <AuthProvider>
         <ToastProvider>
           <AppRoutes />
-          <Chatbot />
+          <Suspense fallback={null}>
+            <Chatbot />
+          </Suspense>
         </ToastProvider>
       </AuthProvider>
     </Router>

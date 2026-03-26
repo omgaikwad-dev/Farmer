@@ -50,9 +50,9 @@ function clearCachedProfile() {
 async function fetchProfileFromFirestore(uid) {
   return new Promise((resolve) => {
     const timer = setTimeout(() => {
-      console.warn('[Auth] Profile fetch timed out after 5s');
+      console.warn('[Auth] Profile fetch timed out after 2s');
       resolve(null);
-    }, 5000);
+    }, 2000);
 
     getDoc(doc(db, 'users', uid))
       .then((snap) => {
@@ -86,27 +86,22 @@ export function AuthProvider({ children }) {
   async function _backgroundFetchProfile(uid) {
     setProfileLoading(true);
 
-    // 1. Try Firestore first
+    // 1. Show cached profile IMMEDIATELY for fast UI render
+    const cached = getCachedProfile(uid);
+    if (cached) {
+      setUserProfile(cached);
+    }
+
+    // 2. Then try Firestore in parallel to get fresh data
     const firestoreData = await fetchProfileFromFirestore(uid);
 
     if (firestoreData) {
-      // Got fresh data from Firestore — always use it
       _setProfile(firestoreData);
-      setProfileLoading(false);
-      return;
+    } else if (!cached) {
+      // 3. No Firestore, no cache — leave existing profile if we have one
+      console.warn('[Auth] No profile found anywhere for uid:', uid);
     }
 
-    // 2. Firestore failed — fall back to localStorage cache
-    const cached = getCachedProfile(uid);
-    if (cached) {
-      console.log('[Auth] Using cached profile for role:', cached.role);
-      setUserProfile(cached); // don't re-cache, it's already there
-      setProfileLoading(false);
-      return;
-    }
-
-    // 3. No Firestore, no cache — leave existing profile if we have one
-    // (signup/login already set it directly)
     setProfileLoading(false);
   }
 

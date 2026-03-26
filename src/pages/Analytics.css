@@ -114,6 +114,16 @@
 
 @media (max-width: 768px) {
   .analytics-page { padding: 20px 16px; }
-  .an-summary { grid-template-columns: repeat(2, 1fr); }
-  .an-charts-grid { grid-template-columns: 1fr; }
+  .an-summary { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .an-charts-grid { grid-template-columns: 1fr; gap: 16px; }
+  .an-stat { padding: 20px 16px; }
+}
+
+@media (max-width: 480px) {
+  .an-summary { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .an-stat { padding: 16px 12px; }
+  .an-stat-icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .an-stat-value { font-size: 1.4rem; }
+  .an-stat-label { font-size: 0.75rem; }
+  .an-header h1 { font-size: 1.5rem; }
 }

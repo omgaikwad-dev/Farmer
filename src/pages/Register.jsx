@@ -75,7 +75,7 @@ export default function Register() {
   return (
     <div className="auth-page" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
       <div className="auth-bg">
-        <video className="auth-video" autoPlay loop muted playsInline>
+        <video className="auth-video" autoPlay loop muted playsInline preload="none">
           <source src="https://www.pexels.com/download/video/5285672/" type="video/mp4" />
         </video>
         <div className="auth-video-overlay"></div>

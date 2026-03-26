@@ -365,8 +365,8 @@ function TransporterDashboard({ name, uid }) {
   const [monthlyEarnings, setMonthlyEarnings] = useState(Array(12).fill(0));
 
   useEffect(() => {
-    if (!uid) return;
-    const q = query(collection(db, 'orders'), where('transporterId', '==', uid));
+    // Transporters see ALL orders (same as Transport page)
+    const q = query(collection(db, 'orders'));
     const unsub = onSnapshot(q, (snap) => {
       let ordersList = [];
       let earnings = 0;
@@ -375,25 +375,38 @@ function TransporterDashboard({ name, uid }) {
 
       snap.forEach(docSnap => {
         const d = docSnap.data();
-        const amount = d.transportFee || 0;
-        earnings += amount;
-        if (d.status === 'delivered') deliveries++;
+        const status = d.transportStatus || d.status || 'pending';
+        const amount = d.totalAmount || 0;
+
+        // Count delivered earnings
+        if (status === 'delivered') {
+          earnings += amount;
+          deliveries++;
+        }
 
         if (d.createdAt) {
-          const date = d.createdAt.toDate();
-          monthly[date.getMonth()] += amount;
+          try {
+            const date = d.createdAt.toDate();
+            if (status === 'delivered') {
+              monthly[date.getMonth()] += amount;
+            }
+          } catch (e) {}
         }
 
         ordersList.push({
           id: docSnap.id.substring(0, 6).toUpperCase(),
+          fullId: docSnap.id,
           from: d.farmerLocation || 'Origin',
           to: d.buyerLocation || 'Destination',
           cargo: d.productName || 'Goods',
           weight: `${d.quantity || 0} ${d.unit || 'kg'}`,
           amount: amount,
-          status: d.status || 'pending',
-          date: d.createdAt?.toDate().toLocaleDateString('en-IN') || new Date().toLocaleDateString('en-IN'),
-          ts: d.createdAt?.toMillis() || 0
+          status: status,
+          date: d.createdAt?.toDate?.()?.toLocaleDateString('en-IN') || new Date().toLocaleDateString('en-IN'),
+          ts: d.createdAt?.toMillis?.() || 0,
+          farmer: d.farmerName || 'Farmer',
+          buyer: d.buyerName || 'Buyer',
+          assigned: d.assignedTransporter || null
         });
       });
 
@@ -406,8 +419,14 @@ function TransporterDashboard({ name, uid }) {
     return unsub;
   }, [uid]);
 
+  const formatCurrency = (val) => {
+    if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+    if (val >= 1000) return `₹${(val / 1000).toFixed(1)}K`;
+    return `₹${val}`;
+  };
+
   const statCards = [
-    { label: 'Total Earnings', value: totalEarnings > 0 ? `₹${(totalEarnings / 1000).toFixed(1)}K` : '₹0', change: `₹${totalEarnings.toLocaleString()}`, up: totalEarnings > 0, icon: <FiDollarSign />, color: '#f97316', bg: '#fff7ed' },
+    { label: 'Total Earnings', value: formatCurrency(totalEarnings), change: totalEarnings > 0 ? `₹${totalEarnings.toLocaleString()}` : '₹0', up: totalEarnings > 0, icon: <FiDollarSign />, color: '#f97316', bg: '#fff7ed' },
     { label: 'Deliveries Done', value: totalDeliveries, change: `${orders.length} total trips`, up: true, icon: <FiTruck />, color: '#22c55e', bg: '#f0fdf4' },
     { label: 'Active Trips', value: orders.filter(o => o.status === 'in-transit').length, change: 'On the move', up: true, icon: <FiNavigation />, color: '#3b82f6', bg: '#eff6ff' },
     { label: 'Pending', value: orders.filter(o => o.status === 'pending').length, change: 'Awaiting pickup', up: false, icon: <FiClock />, color: '#eab308', bg: '#fefce8' },
@@ -495,10 +514,10 @@ function BuyerOrdersTable({ orders, onCancel }) {
 
   return (
     <motion.div className="orders-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-      <div className="chart-header">
-        <h3>📦 My Orders</h3>
-        <div>
-          <button className="btn btn-sm btn-secondary" onClick={exportToExcel} style={{ marginRight: '10px' }}>Export Excel</button>
+      <div className="chart-header" style={{ flexWrap: 'wrap' }}>
+        <h3 style={{ margin: 0 }}>📦 My Orders</h3>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button className="btn btn-sm btn-secondary" onClick={exportToExcel}>Export Excel</button>
         </div>
       </div>
       <div className="orders-table-container">
@@ -604,10 +623,10 @@ function RecentOrdersTable({ orders, role }) {
 
   return (
     <motion.div className="orders-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-      <div className="chart-header">
-        <h3>{role === 'transporter' ? 'Recent Trips' : 'Recent Orders'}</h3>
-        <div>
-          <button className="btn btn-sm btn-secondary" onClick={exportToExcel} style={{ marginRight: '10px' }}>Export Excel</button>
+      <div className="chart-header" style={{ flexWrap: 'wrap' }}>
+        <h3 style={{ margin: 0 }}>{role === 'transporter' ? 'Recent Trips' : 'Recent Orders'}</h3>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button className="btn btn-sm btn-secondary" onClick={exportToExcel}>Export Excel</button>
           <button className="btn btn-sm btn-secondary">View All</button>
         </div>
       </div>

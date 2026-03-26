@@ -289,6 +289,39 @@
 
   .rt-overview {
     flex-direction: column;
+    align-items: stretch;
+    padding: 24px 20px;
+  }
+
+  .rt-score {
     align-items: center;
+    border-bottom: 1px solid var(--neutral-200);
+    padding-bottom: 24px;
+    margin-bottom: 12px;
+  }
+
+  .rt-distribution {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .ratings-page {
+    padding: 16px;
+  }
+
+  .rt-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .review-meta {
+    align-items: flex-start;
+    margin-top: 8px;
   }
 }
